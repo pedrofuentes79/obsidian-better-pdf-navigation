@@ -43,7 +43,6 @@ var BetterPdfNavigationPlugin = class extends import_obsidian.Plugin {
     this.addCommand({
       id: "pdf-next-page",
       name: "PDF: Next Page",
-      hotkeys: [{ modifiers: [], key: "j" }],
       callback: () => {
         this.dispatchCommandToPdfViewer("nextpage");
       }
@@ -51,7 +50,6 @@ var BetterPdfNavigationPlugin = class extends import_obsidian.Plugin {
     this.addCommand({
       id: "pdf-prev-page",
       name: "PDF: Previous Page",
-      hotkeys: [{ modifiers: [], key: "k" }],
       callback: () => {
         this.dispatchCommandToPdfViewer("previouspage");
       }
