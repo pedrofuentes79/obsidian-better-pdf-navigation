@@ -1,12 +1,38 @@
-import { Plugin } from 'obsidian';
+import { Plugin, WorkspaceLeaf, View} from 'obsidian';
+
+type PdfDirection = 'nextpage' | 'previouspage';
+interface PdfViewer {
+	eventBus?: {
+		dispatch?: (command: PdfDirection) => void;
+	}
+}
+
+interface PdfView extends View {
+	// viewer can be null if the obsidian tab has not been "loaded" yet.
+	// e.g: if you open obsidian, and it opens with the old tabs you had when closing it,
+	// the viewer will be null for those leaves. When you switch to them, the viewer will be loaded.
+	viewer: {
+		child: {
+			pdfViewer: PdfViewer;
+		};
+	} | null;
+}
+
+interface PdfLeaf extends WorkspaceLeaf {
+	view: PdfView;
+	// This is not declared, but it has it at runtime.
+	containerEl: HTMLElement;
+}
+
 
 export default class BetterPdfNavigationPlugin extends Plugin {
 
-	private getActivePdfViewer(): any | null {
+	private getActivePdfViewer(): PdfViewer | undefined {
 		const leaves = this.app.workspace.getLeavesOfType('pdf');
-		const leaf = leaves.find(l => (l as any).containerEl?.classList?.contains('mod-active')) || leaves[0];
-		const view = (leaf?.view as any) || null;
-		return view ? (view.viewer?.child?.pdfViewer ?? view.pdfViewer ?? view.viewer ?? null) : null;
+		const activeLeaf = leaves.find(l => (l as PdfLeaf).containerEl.classList?.contains('mod-active')) || leaves[0];
+		const view = activeLeaf?.view as PdfView;
+		// if there was no view, just return undefined
+		return view?.viewer?.child?.pdfViewer;
 	}
 
 	async onload() {
@@ -32,7 +58,7 @@ export default class BetterPdfNavigationPlugin extends Plugin {
 
 	}
 
-	dispatchCommandToPdfViewer(directionCommand: 'nextpage' | 'previouspage') {
+	dispatchCommandToPdfViewer(directionCommand: PdfDirection) {
 		const pdfViewer = this.getActivePdfViewer();
 		if (!pdfViewer) {
 			console.log('No active PDF view');

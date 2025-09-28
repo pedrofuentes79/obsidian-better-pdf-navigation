@@ -34,9 +34,9 @@ var import_obsidian = require("obsidian");
 var BetterPdfNavigationPlugin = class extends import_obsidian.Plugin {
   getActivePdfViewer() {
     const leaves = this.app.workspace.getLeavesOfType("pdf");
-    const leaf = leaves.find((l) => l.containerEl?.classList?.contains("mod-active")) || leaves[0];
-    const view = leaf?.view || null;
-    return view ? view.viewer?.child?.pdfViewer ?? view.pdfViewer ?? view.viewer ?? null : null;
+    const activeLeaf = leaves.find((l) => l.containerEl.classList?.contains("mod-active")) || leaves[0];
+    const view = activeLeaf?.view;
+    return view?.viewer?.child?.pdfViewer;
   }
   async onload() {
     console.log("Loading Better PDF Navigation plugin");
